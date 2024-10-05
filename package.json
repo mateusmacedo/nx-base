@@ -2,9 +2,14 @@
   "name": "@mmda/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky"
+  },
   "private": true,
   "devDependencies": {
+    "@commitlint/cli": "^18.0.0",
+    "@commitlint/config-conventional": "^18.0.0",
+    "@jscutlery/semver": "^5.3.1",
     "@nestjs/schematics": "^10.0.1",
     "@nx/eslint": "^18.3.4",
     "@nx/eslint-plugin": "^18.3.4",
@@ -15,7 +20,9 @@
     "@nx/node": "^18.3.4",
     "@nx/workspace": "18.3.4",
     "eslint": "~8.57.0",
+    "husky": "^9.1.6",
     "jest": "^29.4.1",
+    "lint-staged": "^15.2.10",
     "nx": "18.3.4"
   },
   "dependencies": {

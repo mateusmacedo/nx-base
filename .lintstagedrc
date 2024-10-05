@@ -1,0 +1,7 @@
+{
+  "*.ts": [
+    "nx affected --target=lint --uncommitted --fix",
+    "nx affected --target=format --uncommitted",
+    "nx affected --target=test --uncommitted"
+  ]
+}
