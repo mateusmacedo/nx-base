@@ -16,7 +16,7 @@
     "@nx/jest": "19.8.4",
     "@nx/js": "19.8.4",
     "@nx/nest": "19.8.4",
-    "@nx/next": "19.8.4",
+    "@nx/next": "^19.6.6",
     "@nx/node": "19.8.4",
     "@nx/workspace": "19.8.4",
     "@swc-node/register": "1.9.2",
@@ -39,7 +39,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
-    "next": "14.2.3",
+    "next": "^14.2.14",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tslib": "^2.3.0"
