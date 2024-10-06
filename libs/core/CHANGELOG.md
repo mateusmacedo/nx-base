@@ -4,7 +4,6 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## 0.1.0 (2024-10-06)
 
-
 ### ✨ Features
 
 * **core:** :sparkles: add logging dependencies winston & pino ([235a924](https://github.mmda/mateusmacedo/nx-base/commit/235a924af806fb2018971244906c588f5502a178))

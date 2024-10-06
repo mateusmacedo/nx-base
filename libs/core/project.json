@@ -1,19 +1,50 @@
 {
-  "name": "core",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/core/src",
+  "name": "core",
   "projectType": "library",
-  "tags": ["core", "node"],
+  "sourceRoot": "libs/core/src",
+  "tags": [
+    "core",
+    "node"
+  ],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/core",
-        "tsConfig": "libs/core/tsconfig.lib.json",
-        "packageJson": "libs/core/package.json",
+        "assets": [
+          "libs/core/*.md"
+        ],
         "main": "libs/core/src/index.ts",
-        "assets": ["libs/core/*.md"]
+        "outputPath": "dist/libs/core",
+        "packageJson": "libs/core/package.json",
+        "tsConfig": "libs/core/tsconfig.lib.json"
+      },
+      "outputs": [
+        "{options.outputPath}"
+      ]
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": {
+          "commitUrlFormat": "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
+          "compareUrlFormat": "{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}",
+          "issueUrlFormat": "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
+          "types": [
+            {
+              "section": "✨ Features",
+              "type": "feat"
+            },
+            {
+              "section": "🐞 Bug Fixes",
+              "type": "fix"
+            },
+            {
+              "hidden": true,
+              "type": "chore"
+            }
+          ]
+        }
       }
     }
   }
