@@ -3,3 +3,14 @@
 /coverage
 /.nx/cache
 /.nx/workspace-data
+/.vscode
+/node_modules
+*.lock
+public/*
+.storybook
+.next
+.gitignore
+.eslintcache
+.gitattributes
+.tsBuildInfoFile
+.stylelintcache
