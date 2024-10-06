@@ -34,7 +34,6 @@ describe('PinoTransport', () => {
     jest.clearAllMocks()
   })
 
-  // Testes Happy Path
   it('Create a PinoTransport instance with default options and verify that the logger is initialized with the default log level "info".', () => {
     const pinoTransport = new PinoTransport()
     expect(pino).toHaveBeenCalledWith({ level: 'info', transport: undefined }, undefined)
@@ -69,7 +68,6 @@ describe('PinoTransport', () => {
     expect(mockPinoLogger.error).toHaveBeenCalledWith({ userId: '123' }, 'Test error message')
   })
 
-  // Testes Edge Cases
   it('Instantiate PinoTransport with no options and verify default log level is "info".', () => {
     const pinoTransport = new PinoTransport()
     expect(pino).toHaveBeenCalledWith({ level: 'info', transport: undefined }, undefined)

@@ -17,7 +17,6 @@ describe('JsonTransport', () => {
     jest.restoreAllMocks()
   })
 
-  // Happy Path
   it("JsonTransport logs a message with LogLevel 'info' and a simple string message.", () => {
     transport.log(LogLevel.INFO, 'Test message')
     expect(mockFormatter.format).toHaveBeenCalledWith(LogLevel.INFO, 'Test message', undefined)
@@ -50,15 +49,6 @@ describe('JsonTransport', () => {
     )
   })
 
-  // it("JsonTransport logs a message with LogLevel 'verbose' and a string message containing special characters.", () => {
-  //   const specialMessage = 'Verbose log with special chars: 💡✨🚀'
-  //   transport.log(LogLevel.VERBOSE, specialMessage)
-  //   expect(mockFormatter.format).toHaveBeenCalledWith(LogLevel.VERBOSE, specialMessage, undefined)
-  //   expect(console.log).toHaveBeenCalledWith(
-  //     JSON.stringify({ level: LogLevel.VERBOSE, message: specialMessage, meta: undefined })
-  //   )
-  // })
-
   it("JsonTransport logs a message with LogLevel 'fatal' and ensures the formatter is called correctly.", () => {
     const meta = { critical: true }
     transport.log(LogLevel.FATAL, 'Critical failure', meta)
@@ -68,7 +58,6 @@ describe('JsonTransport', () => {
     )
   })
 
-  // Edge Cases
   it('Logs a message with the lowest possible log level (debug) and verifies the output format.', () => {
     transport.log(LogLevel.DEBUG, 'Low level debug')
     expect(mockFormatter.format).toHaveBeenCalledWith(LogLevel.DEBUG, 'Low level debug', undefined)
@@ -127,7 +116,7 @@ describe('JsonTransport', () => {
   })
 
   it('Logs a message with a non-string type for the message parameter and checks for proper handling.', () => {
-    transport.log(LogLevel.INFO, 12345) // Não há necessidade de forçar o tipo
+    transport.log(LogLevel.INFO, 12345)
     expect(mockFormatter.format).toHaveBeenCalledWith(LogLevel.INFO, '12345', undefined)
     expect(console.log).toHaveBeenCalledWith(
       JSON.stringify({ level: LogLevel.INFO, message: '12345', meta: undefined })

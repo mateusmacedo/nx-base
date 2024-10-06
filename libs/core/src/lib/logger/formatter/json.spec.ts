@@ -8,7 +8,6 @@ describe('JsonFormatter', () => {
     formatter = new JsonFormatter()
   })
 
-  // Happy Path
   it("Format a log entry with level 'info', message 'Application started', and no meta data.", () => {
     const result = formatter.format(LogLevel.INFO, 'Application started')
     const parsedResult = JSON.parse(result)
@@ -69,7 +68,6 @@ describe('JsonFormatter', () => {
     expect(parsedResult.meta).toEqual(meta)
   })
 
-  // Edge Cases
   it('Format a log entry with a valid LogLevel and a message containing special characters (e.g., emojis).', () => {
     const result = formatter.format(LogLevel.INFO, 'Special chars 💡🚀')
     const parsedResult = JSON.parse(result)
