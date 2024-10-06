@@ -1,9 +1,10 @@
 {
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "@nestjs/common": "^10.0.2"
   },
   "main": "./src/index.js",
-  "name": "@mmda/nest-core",
+  "name": "@dignissimos/nest-core",
   "private": true,
   "typings": "./src/index.d.ts",
   "version": "0.0.1"
