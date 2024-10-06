@@ -27,10 +27,10 @@ export class Logger implements ILogger {
   }
 
   private shouldLog(level: LogLevel): boolean {
-    const logLevels = Object.values(LogLevel)
+    const logLevels = [LogLevel.ERROR, LogLevel.WARN, LogLevel.INFO, LogLevel.DEBUG, LogLevel.TRACE, LogLevel.FATAL]
     const currentIndex = logLevels.indexOf(this.currentLevel)
     const levelIndex = logLevels.indexOf(level)
-    return levelIndex >= currentIndex
+    return levelIndex <= currentIndex
   }
 
   private mergeMeta(meta?: unknown): ILogContext {
@@ -50,15 +50,15 @@ export class Logger implements ILogger {
         }
         seen.add(value)
 
-        Object.keys(value).forEach((key) => {
-          const propValue = (value as ILogContext)[key]
-          ;(value as ILogContext)[key] = replaceCircular(propValue) as ILogContext[keyof ILogContext]
-        })
+        const newValue: Array<unknown> | Record<string, unknown> = Array.isArray(value) ? [] : {}
+        for (const [key, val] of Object.entries(value)) {
+          (newValue as Record<string, unknown>)[key] = replaceCircular(val)
+        }
+        return newValue
       }
       return value
     }
 
-    // Retorna o objeto processado, com todas as referências circulares substituídas
     return replaceCircular(obj) as ILogContext
   }
 
