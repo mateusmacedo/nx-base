@@ -1,11 +1,10 @@
 {
-  "name": "@mmda/nest-core",
-  "version": "0.0.1",
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "type": "commonjs",
   "main": "./src/index.js",
+  "name": "@mmda/nest-core",
+  "private": true,
   "typings": "./src/index.d.ts",
-  "private": true
+  "version": "0.0.1"
 }
