@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@mmda/core": ["libs/core/src/index.ts"]
+      "@mmda/core": ["libs/core/src/index.ts"],
+      "@mmda/nest-core": ["libs/nest-core/src/index.ts"]
     },
     "incremental": true,
     "allowSyntheticDefaultImports": true,
@@ -32,7 +33,7 @@
     "noImplicitReturns": false,
     "noPropertyAccessFromIndexSignature": false,
     "noFallthroughCasesInSwitch": false,
-    "noImplicitOverride": true,
+    "noImplicitOverride": true
   },
   "exclude": ["node_modules", "tmp"]
 }
