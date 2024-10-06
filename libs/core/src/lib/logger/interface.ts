@@ -17,7 +17,6 @@ export interface IBaseLogger {
 
 export interface ILogTransport {
   log(level: LogLevel, message: string, meta?: unknown): void
-  flush(): void
 }
 
 export interface ILogFormatter {
