@@ -1,39 +1,49 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": true,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "lib": ["esnext", "dom"],
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@mmda/core": ["libs/core/src/index.ts"],
-      "@mmda/nest-core": ["libs/nest-core/src/index.ts"]
-    },
-    "incremental": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "removeComments": true,
-    "isolatedModules": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
     "allowJs": true,
-    "noImplicitReturns": false,
-    "noPropertyAccessFromIndexSignature": false,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": true,
     "noFallthroughCasesInSwitch": false,
-    "noImplicitOverride": true
+    "noImplicitAny": true,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "paths": {
+      "@dignissimos/core": [
+        "libs/core/src/index.ts"
+      ],
+      "@dignissimos/nest-core": [
+        "libs/nest-core/src/index.ts"
+      ]
+    },
+    "removeComments": true,
+    "rootDir": ".",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "ESNext"
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }
