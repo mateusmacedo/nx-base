@@ -7,7 +7,7 @@ export class JsonFormatter implements ILogFormatter {
 
     const logEntry = {
       level,
-      message: message !== undefined ? message : 'undefined', // Tratar caso undefined
+      message: message !== undefined ? message : 'undefined',
       meta: typeof meta === 'object' && meta !== null ? this.replaceCircular(meta) : {},
       timestamp,
       pid
