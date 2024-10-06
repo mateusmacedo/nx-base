@@ -1,2 +1,7 @@
 node_modules
 *.lock
+tmp
+dist
+.vscode
+.nx
+.husky
