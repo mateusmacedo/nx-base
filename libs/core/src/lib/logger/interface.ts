@@ -1,10 +1,12 @@
+// interface.ts
+
 export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARN = 'warn',
+  FATAL = 'fatal',
   ERROR = 'error',
-  TRACE = 'trace',
-  FATAL = 'fatal'
+  WARN = 'warn',
+  INFO = 'info',
+  DEBUG = 'debug',
+  TRACE = 'trace'
 }
 
 export interface IBaseLogger {
@@ -13,6 +15,8 @@ export interface IBaseLogger {
   error(message: string, meta?: unknown): void
   warn(message: string, meta?: unknown): void
   debug(message: string, meta?: unknown): void
+  trace(message: string, meta?: unknown): void
+  fatal(message: string, meta?: unknown): void
 }
 
 export interface ILogTransport {
