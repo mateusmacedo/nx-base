@@ -1,17 +1,29 @@
+import { Writable } from 'stream'
 import { ILogFormatter, ILogTransport, LogLevel } from '../interface'
+
+export interface JsonTransportOptions {
+  formatter: ILogFormatter
+  output?: Writable
+}
 
 export class JsonTransport implements ILogTransport {
   private formatter: ILogFormatter
+  private output: Writable
 
-  constructor(formatter: ILogFormatter) {
-    if (!formatter) {
+  constructor(options: JsonTransportOptions) {
+    if (!options.formatter) {
       throw new Error('A valid formatter must be provided.')
     }
-    this.formatter = formatter
+    this.formatter = options.formatter
+    this.output = options.output || process.stdout
   }
 
-  log(level: LogLevel, message: string | unknown, meta?: unknown): void {
-    const formattedMessage = this.formatter.format(level, String(message), meta)
-    console.log(formattedMessage)
+  log(level: LogLevel, message: string, meta?: unknown): void {
+    try {
+      const formattedMessage = this.formatter.format(level, message, meta)
+      this.output.write(formattedMessage)
+    } catch (error) {
+      this.output.write(`Error formatting log message: ${error instanceof Error ? error.message : String(error)}`)
+    }
   }
 }
