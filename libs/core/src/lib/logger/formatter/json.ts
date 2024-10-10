@@ -25,11 +25,12 @@ export class JsonFormatter implements ILogFormatter {
           return '[Circular]'
         }
         seen.add(value)
-        for (const key in value) {
-          if (Object.prototype.hasOwnProperty.call(value, key)) {
-            (value as Record<string, unknown>)[key] = traverse((value as Record<string, unknown>)[key])
-          }
+
+        const newValue = Array.isArray(value) ? [] : {}
+        for (const [key, val] of Object.entries(value)) {
+          (newValue as Record<string, unknown>)[key] = traverse(val)
         }
+        return newValue
       }
       return value
     }
