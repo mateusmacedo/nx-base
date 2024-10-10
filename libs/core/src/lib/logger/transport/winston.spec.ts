@@ -106,9 +106,7 @@ describe('WinstonTransport', () => {
     const createLoggerMock = winston.createLogger as jest.MockedFunction<typeof winston.createLogger>
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log(LogLevel.INFO, 'Test info message')
-    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test info message', {
-      meta: undefined
-    })
+    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test info message', undefined)
   })
 
   it('Log a message with level "warn" and additional metadata using the WinstonTransport instance and verify that the metadata is included.', () => {
@@ -117,7 +115,7 @@ describe('WinstonTransport', () => {
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log(LogLevel.WARN, 'Test warn message', { userId: '123' })
     expect(mockLoggerInstance.log).toHaveBeenCalledWith('warn', 'Test warn message', {
-      meta: { userId: '123' }
+      userId: '123'
     })
   })
 
@@ -152,9 +150,7 @@ describe('WinstonTransport', () => {
     const createLoggerMock = winston.createLogger as jest.MockedFunction<typeof winston.createLogger>
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log('undefined' as LogLevel, 'Test undefined log level')
-    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test undefined log level', {
-      meta: undefined
-    })
+    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test undefined log level', undefined)
   })
 
   it('Log a message with an empty string as the message and verify that it does not throw an error.', () => {
@@ -162,7 +158,7 @@ describe('WinstonTransport', () => {
     const createLoggerMock = winston.createLogger as jest.MockedFunction<typeof winston.createLogger>
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log(LogLevel.INFO, '')
-    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', '', { meta: undefined })
+    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', '', undefined)
   })
 
   it('Log a message with a null meta object and ensure it does not affect the logging process.', () => {
@@ -170,9 +166,7 @@ describe('WinstonTransport', () => {
     const createLoggerMock = winston.createLogger as jest.MockedFunction<typeof winston.createLogger>
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log(LogLevel.INFO, 'Test message with null meta', null)
-    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test message with null meta', {
-      meta: null
-    })
+    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test message with null meta', null)
   })
 
   it('Instantiate WinstonTransport with a format that is not a valid winston format and check for error handling.', () => {
@@ -200,7 +194,7 @@ describe('WinstonTransport', () => {
     const createLoggerMock = winston.createLogger as jest.MockedFunction<typeof winston.createLogger>
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log(LogLevel.INFO, longMessage)
-    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', longMessage, { meta: undefined })
+    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', longMessage, undefined)
   })
 
   it('Log a message with special characters in the message and ensure it is logged without issues.', () => {
@@ -209,8 +203,6 @@ describe('WinstonTransport', () => {
     const createLoggerMock = winston.createLogger as jest.MockedFunction<typeof winston.createLogger>
     const mockLoggerInstance = createLoggerMock.mock.results[0].value
     winstonTransport.log(LogLevel.INFO, specialMessage)
-    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', specialMessage, {
-      meta: undefined
-    })
+    expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', specialMessage, undefined)
   })
 })

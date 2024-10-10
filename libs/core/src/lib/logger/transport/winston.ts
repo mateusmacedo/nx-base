@@ -17,25 +17,29 @@ export class WinstonTransport implements ILogTransport {
       transports = [new winston.transports.Console()]
     } = options
 
-    const validLevels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL]
-    const loggerLevel = validLevels.includes(level) ? level : 'info'
-
-    if (!format || typeof format.transform !== 'function') {
-      throw new Error('Invalid format provided.')
-    }
-
-    const loggerTransports = transports && transports.length > 0 ? transports : [new winston.transports.Console()]
+    const loggerLevel = this.mapLogLevel(level)
 
     this.winstonLogger = winston.createLogger({
       level: loggerLevel,
       format,
-      transports: loggerTransports
+      transports
     })
   }
 
+  private mapLogLevel(level: LogLevel): string {
+    const levelMapping: Record<LogLevel, string> = {
+      [LogLevel.FATAL]: 'fatal',
+      [LogLevel.ERROR]: 'error',
+      [LogLevel.WARN]: 'warn',
+      [LogLevel.INFO]: 'info',
+      [LogLevel.DEBUG]: 'debug',
+      [LogLevel.TRACE]: 'silly' // 'silly' is the lowest level in Winston
+    }
+    return levelMapping[level] || 'info'
+  }
+
   log(level: LogLevel, message: string, meta?: unknown): void {
-    const validLevels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL]
-    const logLevel = validLevels.includes(level) ? level : LogLevel.INFO
-    this.winstonLogger.log(logLevel, message, { meta })
+    const logLevel = this.mapLogLevel(level)
+    this.winstonLogger.log(logLevel, message, meta)
   }
 }
