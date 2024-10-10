@@ -111,6 +111,6 @@ describe('PinoTransport', () => {
   it('Pass a null value for the message parameter in the log method and verify that it handles it gracefully.', () => {
     const pinoTransport = new PinoTransport()
     pinoTransport.log(LogLevel.INFO, null as unknown as string)
-    expect(mockPinoLogger.info).toHaveBeenCalledWith(undefined, '')
+    expect(mockPinoLogger.info).toHaveBeenCalledWith(undefined, null)
   })
 })
