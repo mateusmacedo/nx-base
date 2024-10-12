@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.0](https://github.mmda/mateusmacedo/nx-base/compare/core-0.1.0...core-0.2.0) (2024-10-12)
+
+
+### ✨ Features
+
+* **logger:** :sparkles: add circular reference detector ([ef92024](https://github.mmda/mateusmacedo/nx-base/commit/ef920242ed0032f583cf75c118bb6ff93dc6ce15))
+* **logger:** :sparkles: add trace and fatal methods to interface ([9b1cd8c](https://github.mmda/mateusmacedo/nx-base/commit/9b1cd8c4270b4b35d611c5875781d2f7faa7e6d3))
+
+
+### 🐞 Bug Fixes
+
+* **logger:** :bug: handle circular references in json ([d30fb63](https://github.mmda/mateusmacedo/nx-base/commit/d30fb63bea5c7f845fb11198675d1a10fffea80f))
+* **logger:** :bug: handle null values in log method ([9d2a339](https://github.mmda/mateusmacedo/nx-base/commit/9d2a3397a9f3b06d415368e949519edc0c41d9b3))
+
 ## 0.1.0 (2024-10-06)
 
 ### ✨ Features
