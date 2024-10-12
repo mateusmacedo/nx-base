@@ -1,12 +1,43 @@
 import { ILogContext, ILogger, ILogTransport, LogLevel } from './interface'
+
+export class CircularReferenceDetector {
+  private seen = new WeakSet<object>()
+
+  public detect(obj: unknown): unknown {
+    return this.replaceCircular(obj)
+  }
+  private replaceCircular(value: unknown): unknown {
+    if (typeof value === 'object' && value !== null) {
+      if (this.seen.has(value)) {
+        return '[Circular]'
+      }
+      this.seen.add(value)
+
+      const newValue = Array.isArray(value) ? [] : {}
+      for (const [key, val] of Object.entries(value)) {
+        (newValue as Record<string, unknown>)[key] = this.replaceCircular(val)
+      }
+      return newValue
+    }
+    return value
+  }
+}
+
 export class Logger implements ILogger {
-  private transports: ILogTransport[] = []
+  private transports: Set<ILogTransport> = new Set()
   private currentLevel: LogLevel = LogLevel.INFO
   private defaultMeta: ILogContext = {}
 
-  constructor(defaultMeta?: ILogContext) {
+  constructor(
+    defaultMeta?: ILogContext,
+    private metaMerger: (defaultMeta: ILogContext, meta?: ILogContext) => ILogContext = (defaultMeta, meta) => ({
+      ...defaultMeta,
+      ...meta
+    }),
+    private circularDetector: CircularReferenceDetector = new CircularReferenceDetector()
+  ) {
     if (defaultMeta) {
-      this.defaultMeta = defaultMeta
+      this.defaultMeta = { ...defaultMeta }
     }
   }
 
@@ -15,11 +46,11 @@ export class Logger implements ILogger {
   }
 
   addTransport(transport: ILogTransport): void {
-    this.transports.push(transport)
+    this.transports.add(transport)
   }
 
   removeTransport(transport: ILogTransport): void {
-    this.transports = this.transports.filter((t) => t !== transport)
+    this.transports.delete(transport)
   }
 
   setLogLevel(level: LogLevel): void {
@@ -27,39 +58,18 @@ export class Logger implements ILogger {
   }
 
   private shouldLog(level: LogLevel): boolean {
-    const logLevels = [LogLevel.ERROR, LogLevel.WARN, LogLevel.INFO, LogLevel.DEBUG, LogLevel.TRACE, LogLevel.FATAL]
+    const logLevels = [LogLevel.FATAL, LogLevel.ERROR, LogLevel.WARN, LogLevel.INFO, LogLevel.DEBUG, LogLevel.TRACE]
     const currentIndex = logLevels.indexOf(this.currentLevel)
     const levelIndex = logLevels.indexOf(level)
     return levelIndex <= currentIndex
   }
 
-  private mergeMeta(meta?: unknown): ILogContext {
-    if (typeof meta === 'object' && meta !== null) {
-      return { ...this.defaultMeta, ...(meta as ILogContext) }
-    }
-    return this.defaultMeta
+  private mergeMeta(meta?: ILogContext): ILogContext {
+    return this.metaMerger(this.defaultMeta, meta)
   }
 
-  private detectCircularReferences(obj: ILogContext): ILogContext {
-    const seen = new WeakSet<object>()
-
-    const replaceCircular = (value: unknown): unknown => {
-      if (typeof value === 'object' && value !== null) {
-        if (seen.has(value)) {
-          return '[Circular]'
-        }
-        seen.add(value)
-
-        const newValue: Array<unknown> | Record<string, unknown> = Array.isArray(value) ? [] : {}
-        for (const [key, val] of Object.entries(value)) {
-          (newValue as Record<string, unknown>)[key] = replaceCircular(val)
-        }
-        return newValue
-      }
-      return value
-    }
-
-    return replaceCircular(obj) as ILogContext
+  private detectCircularReferences(obj: unknown): unknown {
+    return this.circularDetector.detect(obj)
   }
 
   log(level: LogLevel, message: string, meta?: unknown): void {
@@ -67,11 +77,21 @@ export class Logger implements ILogger {
       return
     }
 
-    const mergedMeta = this.mergeMeta(meta)
+    const mergedMeta = this.mergeMeta(meta as ILogContext)
     const finalMeta = this.detectCircularReferences(mergedMeta)
-    this.transports.forEach((transport) => {
-      transport.log(level, message, finalMeta)
-    })
+
+    for (const transport of this.transports) {
+      try {
+        transport.log(level, message, finalMeta)
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        const errorMeta: ILogContext = {
+          originalMessage: message,
+          error
+        }
+        console.error(`Failed to log message: ${errorMessage}`, errorMeta)
+      }
+    }
   }
 
   info(message: string, meta?: unknown): void {
@@ -88,5 +108,13 @@ export class Logger implements ILogger {
 
   debug(message: string, meta?: unknown): void {
     this.log(LogLevel.DEBUG, message, meta)
+  }
+
+  trace(message: string, meta?: unknown): void {
+    this.log(LogLevel.TRACE, message, meta)
+  }
+
+  fatal(message: string, meta?: unknown): void {
+    this.log(LogLevel.FATAL, message, meta)
   }
 }

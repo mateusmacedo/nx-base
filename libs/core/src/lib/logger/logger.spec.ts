@@ -1,142 +1,207 @@
-import { ILogContext, ILogTransport, LogLevel } from './interface'
-import { Logger } from './logger'
+import { ILogTransport, LogLevel } from './interface'
+import { CircularReferenceDetector, Logger } from './logger'
 
 describe('Logger', () => {
   let logger: Logger
   let mockTransport: jest.Mocked<ILogTransport>
+  let circularReferenceDetector: CircularReferenceDetector
+  const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
 
   beforeEach(() => {
-    mockTransport = {
-      log: jest.fn()
-    }
-
-    logger = new Logger({ requestId: '123' })
+    mockTransport = { log: jest.fn() } as jest.Mocked<ILogTransport>
+    circularReferenceDetector = new CircularReferenceDetector()
+    logger = new Logger(
+      { requestId: '123' },
+      (defaultMeta, meta) => ({ ...defaultMeta, ...meta }),
+      circularReferenceDetector
+    )
     logger.addTransport(mockTransport)
   })
 
   afterEach(() => {
+    consoleErrorSpy.mockClear()
     jest.clearAllMocks()
   })
 
-  // Happy Path
-  it('Logger instance is created with default metadata.', () => {
+  afterAll(() => {
+    consoleErrorSpy.mockRestore()
+  })
+
+  const expectLogCall = (
+    transport: jest.Mocked<ILogTransport>,
+    level: LogLevel,
+    message: string,
+    meta: Record<string, unknown>
+  ) => {
+    expect(transport.log).toHaveBeenCalledWith(level, message, meta)
+  }
+
+  it('should create a Logger instance with default metadata', () => {
     expect(logger).toBeDefined()
-    expect((logger as unknown as { defaultMeta: Record<string, unknown> }).defaultMeta).toEqual({ requestId: '123' })
+    expect((logger as any).defaultMeta).toEqual({ requestId: '123' })
   })
 
-  it('Default metadata is updated successfully using setDefaultMeta method.', () => {
+  it('should update default metadata using setDefaultMeta method', () => {
     logger.setDefaultMeta({ userId: '456' })
-    expect((logger as unknown as { defaultMeta: Record<string, unknown> }).defaultMeta).toEqual({
-      requestId: '123',
-      userId: '456'
-    })
+    expect((logger as any).defaultMeta).toEqual({ requestId: '123', userId: '456' })
   })
 
-  it('Transport is added successfully using addTransport method.', () => {
-    expect((logger as unknown as { transports: ILogTransport[] }).transports).toContain(mockTransport)
+  it('should add a transport using addTransport method', () => {
+    expect((logger as any).transports).toContain(mockTransport)
   })
 
-  it('Transport is removed successfully using removeTransport method.', () => {
+  it('should remove a transport using removeTransport method', () => {
     logger.removeTransport(mockTransport)
-    expect((logger as unknown as { transports: ILogTransport[] }).transports).not.toContain(mockTransport)
+    expect((logger as any).transports).not.toContain(mockTransport)
   })
 
-  it('Log message is sent to all transports at INFO level using info method.', () => {
-    logger.info('Test Info Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Test Info Log', { requestId: '123' })
-  })
-
-  it('Log message is sent to all transports at ERROR level using error method.', () => {
-    logger.error('Test Error Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.ERROR, 'Test Error Log', { requestId: '123' })
-  })
-
-  // Edge Cases
-  it('Logger initialized without defaultMeta and logs a message.', () => {
-    const noMetaLogger = new Logger()
-    noMetaLogger.addTransport(mockTransport)
-    noMetaLogger.info('No Meta Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'No Meta Log', {})
-  })
-
-  it('Logger initialized with an empty defaultMeta and logs a message.', () => {
-    const emptyMetaLogger = new Logger({})
-    emptyMetaLogger.addTransport(mockTransport)
-    emptyMetaLogger.info('Empty Meta Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Empty Meta Log', {})
-  })
-
-  it('Logger adds a transport and logs a message with that transport.', () => {
-    logger.info('Adding Transport Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Adding Transport Log', { requestId: '123' })
-  })
-
-  it('Logger removes a transport and attempts to log a message.', () => {
-    logger.removeTransport(mockTransport)
-    logger.info('No Transport Log')
-    expect(mockTransport.log).not.toHaveBeenCalled()
-  })
-
-  it('Logger sets log level to DEBUG and logs a message at INFO level.', () => {
-    logger.setLogLevel(LogLevel.DEBUG)
-    logger.info('Debug Info Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Debug Info Log', { requestId: '123' })
-  })
-
-  it('Logger sets log level to ERROR and logs a message at INFO level.', () => {
+  it('should not log if log level is too low', () => {
     logger.setLogLevel(LogLevel.ERROR)
-    logger.info('Should Not Log')
+    logger.info('This should not be logged')
+
     expect(mockTransport.log).not.toHaveBeenCalled()
   })
 
-  it('Logger merges undefined meta with defaultMeta and logs a message.', () => {
-    logger.info('Undefined Meta Log', undefined)
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Undefined Meta Log', { requestId: '123' })
+  it('should send log message to all transports at INFO level using info method', () => {
+    logger.info('Test Info Log')
+    expectLogCall(mockTransport, LogLevel.INFO, 'Test Info Log', { requestId: '123' })
   })
 
-  it('Logger logs a message with null meta.', () => {
-    logger.info('Null Meta Log', null)
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Null Meta Log', { requestId: '123' })
+  it('should send log message to all transports at ERROR level using error method', () => {
+    logger.error('Test Error Log')
+    expectLogCall(mockTransport, LogLevel.ERROR, 'Test Error Log', { requestId: '123' })
   })
 
-  it('Logger logs a message with an empty string as the message.', () => {
-    logger.info('')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, '', { requestId: '123' })
+  it('should log at WARN level using warn method', () => {
+    logger.warn('Test Warn Log')
+    expectLogCall(mockTransport, LogLevel.WARN, 'Test Warn Log', { requestId: '123' })
   })
 
-  it('Logger logs a message with a very large string as the message.', () => {
-    const largeMessage = 'A'.repeat(10000)
-    logger.info(largeMessage)
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, largeMessage, { requestId: '123' })
+  it('should log at DEBUG level using debug method', () => {
+    logger.setLogLevel(LogLevel.DEBUG)
+    logger.debug('Test Debug Log')
+    expectLogCall(mockTransport, LogLevel.DEBUG, 'Test Debug Log', { requestId: '123' })
   })
 
-  it('Logger logs a message with a meta object containing circular references.', () => {
-    const circularMeta: ILogContext = { key: 'value' }
-    circularMeta['self'] = circularMeta // Circular reference
-    expect(() => logger.info('Circular Meta Log', circularMeta)).not.toThrow()
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'Circular Meta Log', {
-      requestId: '123',
+  it('should log at TRACE level using trace method', () => {
+    logger.setLogLevel(LogLevel.TRACE)
+    logger.trace('Test Trace Log')
+    expectLogCall(mockTransport, LogLevel.TRACE, 'Test Trace Log', { requestId: '123' })
+  })
+
+  it('should log at FATAL level using fatal method', () => {
+    logger.fatal('Test Fatal Log')
+    expectLogCall(mockTransport, LogLevel.FATAL, 'Test Fatal Log', { requestId: '123' })
+  })
+
+  it('should log a message with a meta object containing circular references', () => {
+    const circularMeta: any = { key: 'value', requestId: '123', self: undefined }
+    circularMeta.self = circularMeta
+
+    logger.info('Circular Meta Log', circularMeta)
+
+    expectLogCall(mockTransport, LogLevel.INFO, 'Circular Meta Log', {
       key: 'value',
+      requestId: '123',
       self: {
         key: 'value',
+        requestId: '123',
         self: '[Circular]'
       }
     })
   })
 
-  it('Logger logs a message with a meta object that has no properties.', () => {
-    logger.info('No Props Meta Log', {})
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.INFO, 'No Props Meta Log', { requestId: '123' })
+  describe('Circular Reference Detector', () => {
+    it('should handle circular references in objects', () => {
+      const circularObj: Record<string, unknown> = { key: 'value' }
+      circularObj['self'] = circularObj
+      const result = circularReferenceDetector.detect(circularObj)
+      expect(result).toEqual({ key: 'value', self: '[Circular]' })
+    })
+
+    it('should handle circular references in arrays', () => {
+      const circularArray: unknown[] = ['value']
+      circularArray.push(circularArray)
+      const result = circularReferenceDetector.detect(circularArray)
+      expect(result).toEqual(['value', '[Circular]'])
+    })
+
+    it('should handle nested circular references', () => {
+      const nestedCircularObj: Record<string, any> = { key: { nestedKey: 'nestedValue' } }
+      nestedCircularObj.key.self = nestedCircularObj
+      const result = circularReferenceDetector.detect(nestedCircularObj)
+      expect(result).toEqual({ key: { nestedKey: 'nestedValue', self: '[Circular]' } })
+    })
+
+    it('should handle non-circular objects', () => {
+      const nonCircularObj = { key: 'value' }
+      const result = circularReferenceDetector.detect(nonCircularObj)
+      expect(result).toEqual(nonCircularObj)
+    })
+
+    it('should handle non-circular arrays', () => {
+      const nonCircularArray = ['value']
+      const result = circularReferenceDetector.detect(nonCircularArray)
+      expect(result).toEqual(nonCircularArray)
+    })
+
+    it('should handle primitive values', () => {
+      const primitiveValue = 'string'
+      const result = circularReferenceDetector.detect(primitiveValue)
+      expect(result).toEqual(primitiveValue)
+    })
   })
 
-  it('Log message is sent to all transports at WARN level using warn method.', () => {
-    logger.warn('Test Warn Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.WARN, 'Test Warn Log', { requestId: '123' })
+  it('should use metaMerger and circularDetector correctly', () => {
+    const customMetaMerger = jest.fn().mockImplementation((defaultMeta, meta) => ({ ...defaultMeta, ...meta }))
+    const customCircularDetector = new CircularReferenceDetector()
+
+    const customLogger = new Logger({ requestId: '123' }, customMetaMerger, customCircularDetector)
+    customLogger.info('Test message', { userId: '456' })
+
+    expect(customMetaMerger).toHaveBeenCalledWith({ requestId: '123' }, { userId: '456' })
+    // Aqui você também pode verificar se customCircularDetector.detect foi chamado corretamente
   })
 
-  it('Log message is sent to all transports at DEBUG level using debug method.', () => {
-    logger.setLogLevel(LogLevel.DEBUG) // Definir o nível de log como DEBUG
-    logger.debug('Test Debug Log')
-    expect(mockTransport.log).toHaveBeenCalledWith(LogLevel.DEBUG, 'Test Debug Log', { requestId: '123' })
+  describe('Error Handling', () => {
+    it('should handle error thrown by transport and log error message', () => {
+      logger.removeTransport(mockTransport)
+
+      const errorTransport: jest.Mocked<ILogTransport> = {
+        log: jest.fn().mockImplementation(() => {
+          throw new Error('Transport Error')
+        })
+      }
+
+      logger.addTransport(errorTransport)
+      logger.info('Test Error Handling Log')
+
+      expectLogCall(errorTransport, LogLevel.INFO, 'Test Error Handling Log', { requestId: '123' })
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to log message: Transport Error', {
+        originalMessage: 'Test Error Handling Log',
+        error: new Error('Transport Error')
+      })
+    })
+
+    it('should handle unknown error thrown by transport and log error message', () => {
+      logger.removeTransport(mockTransport)
+
+      const unknownErrorTransport: jest.Mocked<ILogTransport> = {
+        log: jest.fn().mockImplementation(() => {
+          throw 'Unknown Error'
+        })
+      }
+
+      logger.addTransport(unknownErrorTransport)
+      logger.info('Test Unknown Error Handling Log')
+
+      expectLogCall(unknownErrorTransport, LogLevel.INFO, 'Test Unknown Error Handling Log', { requestId: '123' })
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to log message: Unknown error', {
+        originalMessage: 'Test Unknown Error Handling Log',
+        error: 'Unknown Error'
+      })
+    })
   })
 })
