@@ -1,0 +1,26 @@
+{
+  "name": "nest-hello",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/nest-hello/src",
+  "projectType": "application",
+  "tags": ["app", "nest"],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "nest-hello:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "nest-hello:build:development"
+        },
+        "production": {
+          "buildTarget": "nest-hello:build:production"
+        }
+      }
+    }
+  }
+}
