@@ -47,7 +47,7 @@ describe('WinstonTransport', () => {
     jest.clearAllMocks()
   })
 
-  it('Instantiate WinstonTransport with no options and verify default log level is "info".', () => {
+  it('Create WinstonTransport with no options and verify default log level is "info".', () => {
     new WinstonTransport()
     expect(winston.createLogger).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -119,7 +119,7 @@ describe('WinstonTransport', () => {
     })
   })
 
-  it('Instantiate WinstonTransport with an invalid log level and check if it defaults to "info".', () => {
+  it('Create WinstonTransport with an invalid log level and check if it defaults to "info".', () => {
     new WinstonTransport({ level: 'invalid' as LogLevel })
     expect(winston.createLogger).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -132,7 +132,7 @@ describe('WinstonTransport', () => {
     )
   })
 
-  it('Instantiate WinstonTransport with an empty transports array and ensure it uses the default console transport.', () => {
+  it('Create WinstonTransport with an empty transports array and ensure it uses the default console transport.', () => {
     new WinstonTransport({ transports: [] })
     expect(winston.createLogger).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -169,12 +169,12 @@ describe('WinstonTransport', () => {
     expect(mockLoggerInstance.log).toHaveBeenCalledWith('info', 'Test message with null meta', null)
   })
 
-  it('Instantiate WinstonTransport with a format that is not a valid winston format and check for error handling.', () => {
+  it('Create WinstonTransport with a format that is not a valid winston format and check for error handling.', () => {
     const invalidFormat = 'invalidFormat' as unknown as winston.Logform.Format
     expect(() => new WinstonTransport({ format: invalidFormat })).toThrow('Invalid format provided.')
   })
 
-  it('Instantiate WinstonTransport with a very large number of transports and verify that it initializes without errors.', () => {
+  it('Create WinstonTransport with a very large number of transports and verify that it initializes without errors.', () => {
     const transports = new Array(100).fill(new winston.transports.Console())
     new WinstonTransport({ transports })
     expect(winston.createLogger).toHaveBeenCalledWith(
