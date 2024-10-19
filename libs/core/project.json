@@ -26,6 +26,7 @@
     "version": {
       "executor": "@jscutlery/semver:version",
       "options": {
+        "baseBranch": "main",
         "preset": {
           "commitUrlFormat": "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
           "compareUrlFormat": "{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}",
