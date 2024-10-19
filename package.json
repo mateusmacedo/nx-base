@@ -2,10 +2,7 @@
   "name": "@dignissimos/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {
-    "prepare": "husky"
-  },
-  "private": true,
+  "private": false,
   "devDependencies": {
     "@commitlint/cli": "^18.0.0",
     "@commitlint/config-conventional": "^18.0.0",
