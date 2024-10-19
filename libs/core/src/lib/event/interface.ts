@@ -12,7 +12,7 @@ export interface IEvent<T extends object, ID> {
 
 export interface IEventBus {
   publish<T extends object, ID>(event: IEvent<T, ID>): Result<void, Error>
-  subscribe<T extends object, ID>(eventType: string): Result<Observable<IEvent<T, ID>>, Error>
+  subscribe<T extends object, ID>(eventType: string): Observable<Result<IEvent<T, ID>, Error>>
 }
 
 export class EventBus implements IEventBus {
@@ -22,7 +22,10 @@ export class EventBus implements IEventBus {
     return Result.ok(undefined)
   }
 
-  subscribe<T extends object, ID>(eventType: string): Result<Observable<IEvent<T, ID>>, Error> {
-    return Result.ok(this.eventSubject.asObservable().pipe(filter(event => event.name === eventType), map(event => event as IEvent<T, ID>)))
+  subscribe<T extends object, ID>(eventType: string): Observable<Result<IEvent<T, ID>, Error>> {
+    return this.eventSubject.asObservable().pipe(
+      filter(event => event.name === eventType),
+      map(event => Result.ok<IEvent<T, ID>, Error>(event))
+    )
   }
 }
