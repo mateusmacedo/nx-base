@@ -160,7 +160,6 @@ describe('Logger', () => {
     customLogger.info('Test message', { userId: '456' })
 
     expect(customMetaMerger).toHaveBeenCalledWith({ requestId: '123' }, { userId: '456' })
-    // Aqui você também pode verificar se customCircularDetector.detect foi chamado corretamente
   })
 
   describe('Error Handling', () => {

@@ -1,5 +1,3 @@
-// interface.ts
-
 export enum LogLevel {
   FATAL = 'fatal',
   ERROR = 'error',

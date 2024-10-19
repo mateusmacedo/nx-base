@@ -33,7 +33,7 @@ export class WinstonTransport implements ILogTransport {
       [LogLevel.WARN]: 'warn',
       [LogLevel.INFO]: 'info',
       [LogLevel.DEBUG]: 'debug',
-      [LogLevel.TRACE]: 'silly' // 'silly' is the lowest level in Winston
+      [LogLevel.TRACE]: 'silly'
     }
     return levelMapping[level] || 'info'
   }

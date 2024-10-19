@@ -124,7 +124,7 @@ describe('JsonFormatter', () => {
 
   it('Format a log entry with a valid LogLevel and a meta object that contains a circular reference.', () => {
     const circularMeta: Record<string, unknown> = { key: 'value' }
-    circularMeta.self = circularMeta // Circular reference
+    circularMeta.self = circularMeta
 
     const result = formatter.format(LogLevel.INFO, 'Circular meta', circularMeta)
     const parsedResult = JSON.parse(result)
