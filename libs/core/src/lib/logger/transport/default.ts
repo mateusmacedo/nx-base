@@ -1,21 +1,30 @@
-import { Writable } from 'stream'
 import { ILogFormatter, ILogTransport, LogLevel } from '../interface'
 
-export interface JsonTransportOptions {
-  formatter: ILogFormatter
-  output?: Writable
+export interface IWritable {
+  write(chunk: unknown, encoding?: string, callback?: (error: Error | null) => void): boolean
 }
 
-export class JsonTransport implements ILogTransport {
-  private formatter: ILogFormatter
-  private output: Writable
+export interface IAsyncWritable {
+  write(chunk: unknown, encoding?: string): Promise<void>
+}
 
-  constructor(options: JsonTransportOptions) {
+export type TWritable = IWritable | IAsyncWritable
+
+export interface DefaultTransportOptions {
+  formatter: ILogFormatter
+  writeable?: TWritable
+}
+
+export class DefaultTransport implements ILogTransport {
+  private formatter: ILogFormatter
+  private output: TWritable
+
+  constructor(options: DefaultTransportOptions) {
     if (!options.formatter) {
       throw new Error('A valid formatter must be provided.')
     }
     this.formatter = options.formatter
-    this.output = options.output || process.stdout
+    this.output = options.writeable || (process.stdout as TWritable)
   }
 
   log(level: LogLevel, message: string, meta?: unknown): void {
