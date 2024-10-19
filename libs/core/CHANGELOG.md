@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.0](https://github.mmda/mateusmacedo/nx-base/compare/core-0.2.0...core-0.3.0) (2024-10-19)
+
+
+### ✨ Features
+
+* **core:** :sparkles: add result class for error handling ([e0de538](https://github.mmda/mateusmacedo/nx-base/commit/e0de538192e0465107b6c8030aa614080e35a237))
+
 ## [0.2.0](https://github.mmda/mateusmacedo/nx-base/compare/core-0.1.0...core-0.2.0) (2024-10-12)
 
 

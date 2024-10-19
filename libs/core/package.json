@@ -1,6 +1,6 @@
 {
   "name": "@dignissimos/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "dependencies": {
     "pino": "^9.4.0",
     "tslib": "^2.3.0",
