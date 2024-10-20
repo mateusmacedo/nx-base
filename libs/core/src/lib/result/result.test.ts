@@ -17,6 +17,9 @@ describe('Result', () => {
       expect(result.isFailure).toBe(true)
       expect(result.error).toBe('error')
     })
+    it('should throw an error if the error is undefined', () => {
+      expect(() => Result.fail(undefined)).toThrow('Error cannot be undefined')
+    })
   })
 
   describe('value getter', () => {
@@ -43,17 +46,33 @@ describe('Result', () => {
     })
   })
 
-  describe('andThen', () => {
+  describe('andThenAsync', () => {
     it('should chain successful results', async () => {
       const result = Result.ok('success')
-      const chainedResult = await result.andThen(async (value) => Result.ok(value + ' chained'))
+      const chainedResult = await result.andThenAsync(async (value) => Result.ok(value + ' chained'))
       expect(chainedResult.isSuccess).toBe(true)
       expect(chainedResult.value).toBe('success chained')
     })
 
     it('should handle failed results', async () => {
       const result = Result.fail('error')
-      const chainedResult = await result.andThen(async (value) => Result.ok(value + ' chained'))
+      const chainedResult = await result.andThenAsync(async (value) => Result.ok(value + ' chained'))
+      expect(chainedResult.isFailure).toBe(true)
+      expect(chainedResult.error).toBe('error')
+    })
+  })
+
+  describe('andThen', () => {
+    it('should chain successful results', () => {
+      const result = Result.ok('success')
+      const chainedResult = result.andThen((value) => Result.ok(value + ' chained'))
+      expect(chainedResult.isSuccess).toBe(true)
+      expect(chainedResult.value).toBe('success chained')
+    })
+
+    it('should handle failed results', () => {
+      const result = Result.fail('error')
+      const chainedResult = result.andThen((value) => Result.ok(value + ' chained'))
       expect(chainedResult.isFailure).toBe(true)
       expect(chainedResult.error).toBe('error')
     })

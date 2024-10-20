@@ -28,14 +28,24 @@ export class Result<T, E> {
   }
 
   public static fail<T = never, E = any>(error: E): Result<T, E> {
+    if (error === undefined) {
+      throw new Error('Error cannot be undefined')
+    }
     return new Result<T, E>(undefined, error)
   }
 
-  public async andThen<U>(func: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>> {
+  public async andThenAsync<U>(func: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>> {
     if (this.isFailure) {
       return Result.fail<U, E>(this.error)
     }
     return await func(this.value as T)
+  }
+
+  public andThen<U>(func: (value: T) => Result<U, E>): Result<U, E> {
+    if (this.isFailure) {
+      return Result.fail<U, E>(this.error)
+    }
+    return func(this.value as T)
   }
 
   public onFailure(func: (error: E) => void): Result<T, E> {
@@ -56,3 +66,4 @@ export class Result<T, E> {
 export type ResultOk<T> = Result<T, never>
 export type ResultFail<E> = Result<never, E>
 export type ResultOr<T, E> = Result<T, E>
+
