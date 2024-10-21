@@ -1,4 +1,4 @@
-import { Result } from '../result/result'
+import { Result } from '../result/result';
 
 export interface IMessage<T extends object | T[]> {
   readonly id: string
@@ -9,16 +9,22 @@ export interface IMessage<T extends object | T[]> {
   readonly correlation: string
 }
 
-export interface IChannel <M extends IMessage<any>> {
-  publish(message: M): Result<void, Error>
-  subscribe(messageType: string, handler: (message: M) => void): Result<void, Error>
-}
-
 export interface IHandler<T extends IMessage<any>, R, E extends Error> {
+  canHandle(message: T): boolean
   handle(message: T): Result<R, E>
+  asyncHandle(message: T): Promise<Result<R, E>>
 }
 
-export interface IBus<M extends IMessage<any>, H extends IHandler<any, any, any>> {
-  publish(message: M): Result<void, Error>
-  subscribe(messageType: string, handler: H): Result<void, Error>
+export interface IPublisher<T extends IMessage<any>> {
+  publish(message: T): Result<void, Error>
+}
+
+export interface ISubscriber<T extends IMessage<any>> {
+  subscribe(handler: IHandler<T, any, any>): Result<void, Error>
+}
+
+export interface IChannel<T extends IMessage<any>> extends IPublisher<T>, ISubscriber<T> {}
+
+export interface IBus<T extends IMessage<any>> extends IPublisher<T>, ISubscriber<T> {
+  registerChannel(channel: IChannel<T>): Result<void, Error>
 }
